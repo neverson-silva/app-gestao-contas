@@ -4,6 +4,7 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
+    "strictNullChecks": false,
     "baseUrl": ".",
     "paths": {
       "@utils/*": ["src/utils/*"],

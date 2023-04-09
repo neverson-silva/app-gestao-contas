@@ -2,8 +2,10 @@ import {
   STORAGE_APP_DATA_VALIDADE_TOKEN,
   STORAGE_APP_TOKEN,
   STORAGE_APP_LOGIN,
+  STORAGE_APP_USERNAME,
+  STORAGE_APP_PASSWORD,
 } from "@constants/storage.constants";
-import { getStoredItem, deleteStoredItems } from "@utils/util";
+import { getStoredItem, deleteStoredItems, storeItem } from "@utils/util";
 import React, {
   PropsWithChildren,
   createContext,
@@ -38,7 +40,14 @@ export const AuthProvider: React.FC<PropsWithChildren<any>> = ({
     async (username: string, password: string): Promise<boolean> => {
       const response = await api.login(username, password);
       response.roles = response.roles.map((role: any) => role.authority);
+
+      //@ts-ignore
+      delete response.senha;
+      //@ts-ignore
+      delete response.accessToken;
+
       setUsuario(response);
+
       return true;
     },
     [usuario]
@@ -66,8 +75,6 @@ export const AuthProvider: React.FC<PropsWithChildren<any>> = ({
   useEffect(() => {
     getStoredItem(STORAGE_APP_TOKEN).then((token) => {
       if (token) {
-        console.log("Token armazenado", token);
-
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const parsed = jwtDecode(token)?.usuario as unknown as Usuario;

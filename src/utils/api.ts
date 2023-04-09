@@ -43,14 +43,16 @@ export class ApiService {
         return response.data;
       })
       .catch((err) => {
-        if (err?.response?.status === 401) {
+        if (
+          err?.response?.status === 401 ||
+          err?.response?.data?.message === "Bad credentials"
+        ) {
           Alert.alert(
             "Falha na autenticação",
             "Usuário e/ou senha inválidos, tente novamente"
           );
           return;
         }
-        console.log(err);
       });
   }
 

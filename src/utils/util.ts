@@ -16,21 +16,7 @@ export const getStoredItem = async (key: string): Promise<string | null> => {
 
 export async function getStoredObject<T>(key: string): Promise<T | null> {
   const result = await getStoredItem(key);
-  return result ? jsonToClass<T>(result) : null;
-}
-
-function jsonToClass<T>(json: string): T {
-  const object = JSON.parse(json);
-  const clazz = getClass<T>(object);
-  const instance = plainToClass(clazz, object);
-  return instance;
-}
-
-function getClass<T>(object: any): { new (): T } {
-  if (object && typeof object === "object" && object.constructor !== Object) {
-    return object.constructor;
-  }
-  throw new Error("Could not find class");
+  return result ? (JSON.parse(result) as T) : null;
 }
 
 export const deleteStoredItems = async (...keys: string[]) => {

@@ -1,8 +1,9 @@
 export class Usuario {
   id: number;
-  login: string;
+  conta: string;
   roles: string[];
   pessoa: Pessoa;
+  situacao: number;
 }
 
 export class Pessoa {
