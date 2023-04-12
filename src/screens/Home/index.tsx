@@ -1,31 +1,28 @@
-import React, { useEffect } from "react";
-import { View, Text, Button, Center } from "native-base";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  Button,
+  Center,
+  StatusBar,
+  useTheme,
+  ScrollView,
+} from "native-base";
+
+import { SafeAreaView } from "react-native";
+import { ResumoContaMes } from "./components/ResumoContaMes";
 import { useAuth } from "@contexts/auth/useAuth";
-import { getStoredObject, storeItem } from "@utils/util";
-import { STORAGE_APP_USANDO_BIOMETRIA } from "@constants/storage.constants";
-import { UsuariosBiometriaDTO } from "@screens/Login";
 
 export const HomeScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const { usuario, logout } = useAuth();
-
-  const handleNaoUsarBio = async () => {
-    const usuariosBio =
-      (await getStoredObject<UsuariosBiometriaDTO>(
-        STORAGE_APP_USANDO_BIOMETRIA
-      )) ?? {};
-    usuariosBio[usuario!.conta!] = false;
-    await storeItem(STORAGE_APP_USANDO_BIOMETRIA, usuariosBio);
-  };
-
+  const { colors } = useTheme();
+  const { logout } = useAuth();
   return (
-    <View>
-      <Text>Oi Mundo Home</Text>
-      <Button onPress={logout}>Logout</Button>
-      <Center my={12}>
-        <Button onPress={handleNaoUsarBio}>Não quero usar Digital</Button>
-      </Center>
-    </View>
+    <SafeAreaView>
+      <StatusBar backgroundColor={colors.secondary[500]} />
+      <ScrollView m={4}>
+        <ResumoContaMes />
+        <Button onPress={logout}>Sair</Button>
+      </ScrollView>
+    </SafeAreaView>
   );
 };

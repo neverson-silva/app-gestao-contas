@@ -2,8 +2,6 @@ import {
   STORAGE_APP_DATA_VALIDADE_TOKEN,
   STORAGE_APP_TOKEN,
   STORAGE_APP_LOGIN,
-  STORAGE_APP_USERNAME,
-  STORAGE_APP_PASSWORD,
 } from "@constants/storage.constants";
 import { getStoredItem, deleteStoredItems, storeItem } from "@utils/util";
 import React, {

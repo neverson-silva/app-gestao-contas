@@ -20,7 +20,7 @@
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
     "@hookform/resolvers": "^3.0.1",
-    "@react-navigation/material-bottom-tabs": "^6.2.15",
+    "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
     "add": "^2.0.6",

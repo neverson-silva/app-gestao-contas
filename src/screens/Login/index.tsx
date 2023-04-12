@@ -19,13 +19,12 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { AutenticacaoDTO } from "./form/autenticacao.dto";
 import { Controller, useForm } from "react-hook-form";
 import { useAuth } from "@contexts/auth/useAuth";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import * as LocalAuthentication from "expo-local-authentication";
 import { getStoredItem, getStoredObject, storeItem } from "@utils/util";
 import { STORAGE_APP_USANDO_BIOMETRIA } from "@constants/storage.constants";
 import { STORAGE_APP_USERNAME } from "@constants/storage.constants";
 import { STORAGE_APP_PASSWORD } from "@constants/storage.constants";
-import { deleteItemAsync } from "expo-secure-store";
 
 export class UsuariosBiometriaDTO {
   [prop: string]: boolean;
@@ -35,7 +34,7 @@ const resolver = classValidatorResolver(AutenticacaoDTO);
 
 export const LoginScreen: React.FC = () => {
   const { colors } = useTheme();
-  const { login } = useAuth();
+  const { login, logado } = useAuth();
   const {
     control,
     handleSubmit,
@@ -66,7 +65,7 @@ export const LoginScreen: React.FC = () => {
 
       if (
         (!estaUsandoBiometria && biometriaDisponivel) ||
-        (biometriaDisponivel && emailDiferente)
+        (biometriaDisponivel && emailDiferente && !logado)
       ) {
         setCredenciais({ ...data });
         setIsBiometricWarningOpen(true);
@@ -111,7 +110,7 @@ export const LoginScreen: React.FC = () => {
     const biometriaDisponivel =
       (await isLocalAuthAvailable()) && (await hasFacialOrFingerprintSaved());
 
-    if (estaUsandoBiometria && biometriaDisponivel) {
+    if (estaUsandoBiometria && biometriaDisponivel && !logado) {
       setLoading(true);
 
       const { success } = await LocalAuthentication.authenticateAsync({
@@ -201,6 +200,14 @@ export const LoginScreen: React.FC = () => {
                     onChangeText={onChange}
                     value={value}
                     backgroundColor={"white"}
+                    InputLeftElement={
+                      <Icon
+                        as={MaterialIcons}
+                        name={"person"}
+                        size={22}
+                        ml={2}
+                      />
+                    }
                   />
                   {errors?.email && (
                     <FormControl.ErrorMessage
@@ -227,8 +234,11 @@ export const LoginScreen: React.FC = () => {
                     size={"lg"}
                     backgroundColor={"white"}
                     type={showPassword ? "text" : "password"}
+                    InputLeftElement={
+                      <Icon as={MaterialIcons} name={"lock"} size={22} ml={2} />
+                    }
                     InputRightElement={
-                      <Pressable mr={4}>
+                      <Pressable mr={2}>
                         <Icon
                           as={Feather}
                           name={showPassword ? "eye-off" : "eye"}

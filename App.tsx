@@ -5,6 +5,11 @@ import "react-native-gesture-handler";
 import { Routes } from "@routes/routes";
 import { NativeBaseProvider, extendTheme } from "native-base";
 import { AuthProvider } from "@contexts/auth/auth.provider";
+import moment from "moment";
+import "moment/locale/pt-br";
+import { DadosComunsProvider } from "@contexts/dadosComuns/dadosComuns.provider";
+
+moment.locale("pt-br");
 
 export default function App() {
   const theme = extendTheme({
@@ -56,7 +61,9 @@ export default function App() {
     <NavigationContainer>
       <NativeBaseProvider theme={theme}>
         <AuthProvider>
-          <Routes />
+          <DadosComunsProvider>
+            <Routes />
+          </DadosComunsProvider>
         </AuthProvider>
       </NativeBaseProvider>
     </NavigationContainer>

@@ -1,5 +1,5 @@
-import { plainToClass } from "class-transformer";
 import * as SecureStore from "expo-secure-store";
+import moment from "moment";
 
 export const storeItem = async (key: string, item: any) => {
   await SecureStore.setItemAsync(
@@ -23,4 +23,34 @@ export const deleteStoredItems = async (...keys: string[]) => {
   for (const key of keys) {
     await SecureStore.deleteItemAsync(key);
   }
+};
+
+export const formatarMoeda = (valor: string | number): string => {
+  const formatter = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  return formatter.format(Number(valor));
+};
+
+export const converterMoedaEmFloat = (valor: string): number => {
+  return parseFloat(
+    valor
+      .replace("R$", "") // Remove o símbolo de moeda
+      .replace(/\./g, "") // Remove o separador de milhares
+      .replace(",", ".") // Substitui a vírgula decimal por um ponto
+  );
+};
+
+export const formatarData = (
+  data: string | Date | moment.Moment,
+  format = "DD/MM/YYYY"
+): string => {
+  return moment(data).format(format);
+};
+
+export const delay = (time: number) => {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, time);
+  });
 };
