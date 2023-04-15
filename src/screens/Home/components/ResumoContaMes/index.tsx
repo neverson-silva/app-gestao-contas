@@ -13,8 +13,13 @@ import {
   Icon,
   Flex,
   Stack,
+  Pressable,
+  Modal,
+  ScrollView,
+  AlertDialog,
+  Button,
 } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import {
   ResumoFormaPagamento,
@@ -22,10 +27,12 @@ import {
 } from "@models/resumosFormasPagamento";
 import { useAuth } from "@contexts/auth/useAuth";
 import { api } from "@utils/api";
+import { DatePicker } from "@components/DatePicker";
+import { Esqueleto } from "@components/Esqueleto";
 
 export const ResumoContaMes: React.FC = () => {
   const {
-    date: { selected, current },
+    date: { selected, current, changeSelected },
   } = useDadosComuns();
   const [loading, setLoading] = useState(false);
   const { usuario } = useAuth();
@@ -68,41 +75,11 @@ export const ResumoContaMes: React.FC = () => {
       ? "danger.500"
       : "success.500";
   };
+  const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
     buscarResumoMes();
   }, [selected]);
-
-  const Esqueleto = () => {
-    return (
-      <Center w="100%">
-        <HStack
-          w="100%"
-          borderWidth="1"
-          space={8}
-          rounded="md"
-          _dark={{
-            borderColor: "coolGray.500",
-          }}
-          _light={{
-            borderColor: "coolGray.200",
-          }}
-          p="4"
-        >
-          <Skeleton flex="1" h="150" rounded="md" startColor="coolGray.100" />
-          <VStack flex="10" space="4">
-            <Skeleton startColor="primary.300" />
-            <Skeleton.Text />
-            <HStack space="2" alignItems="center">
-              <Skeleton size="5" rounded="full" />
-              <Skeleton h="3" flex="2" rounded="full" />
-              <Skeleton h="3" flex="1" rounded="full" startColor="indigo.300" />
-            </HStack>
-          </VStack>
-        </HStack>
-      </Center>
-    );
-  };
 
   const InfoCard: React.FC<{ resumo: ResumoFormaPagamento }> = ({
     resumo: { porcentagem, valor, titulo },
@@ -148,8 +125,24 @@ export const ResumoContaMes: React.FC = () => {
 
   return (
     <>
-      <Box mb={6}>
-        <Heading mb={3}>{selected.format("MMMM [de] YYYY")}</Heading>
+      <Box mb={6} display={"flex"} flexDirection={"row"}>
+        <Box flexBasis={"80%"}>
+          <Heading mb={3}>{selected.format("MMMM [de] YYYY")}</Heading>
+        </Box>
+        <Box
+          flexBasis={"20%"}
+          alignItems={"flex-end"}
+          justifyContent={"center"}
+        >
+          <Icon
+            as={Feather}
+            name={"calendar"}
+            size={7}
+            color={"muted.700"}
+            onPress={() => setShowCalendar(true)}
+          />
+        </Box>
+
         <Divider color={"muted.00"} />
       </Box>
       <Box mb={4}>
@@ -180,6 +173,15 @@ export const ResumoContaMes: React.FC = () => {
           </>
         )}
       </Box>
+      <DatePicker
+        isOpen={showCalendar}
+        onClose={() => setShowCalendar(!showCalendar)}
+        mode="monthYear"
+        onMonthYearChange={(selectedDate: string) => {
+          const [ano, mes] = selectedDate?.split(" ");
+          changeSelected(Number(mes), Number(ano));
+        }}
+      />
     </>
   );
 };

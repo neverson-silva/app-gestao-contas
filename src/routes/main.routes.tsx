@@ -5,10 +5,11 @@ import { HomeScreen } from "@screens/Home";
 import {
   ROUTE_FATURAS,
   ROUTE_HOME,
+  ROUTE_HOME_ROUTES,
   ROUTE_LANCAMENTOS,
 } from "@constants/routes.constants";
 import { Feather } from "@expo/vector-icons";
-import { useAuth } from "@contexts/auth/useAuth";
+import { HomeRoutes } from "./home.routes";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,8 +31,8 @@ export const MainRoutes: React.FC = () => {
       }}
     >
       <Tab.Screen
-        name={ROUTE_HOME}
-        component={HomeScreen}
+        name={ROUTE_HOME_ROUTES}
+        component={HomeRoutes}
         options={{
           title: "Início",
           headerShown: false,

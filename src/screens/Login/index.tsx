@@ -13,6 +13,7 @@ import {
   Icon,
   Pressable,
   AlertDialog,
+  KeyboardAvoidingView,
 } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
@@ -25,6 +26,7 @@ import { getStoredItem, getStoredObject, storeItem } from "@utils/util";
 import { STORAGE_APP_USANDO_BIOMETRIA } from "@constants/storage.constants";
 import { STORAGE_APP_USERNAME } from "@constants/storage.constants";
 import { STORAGE_APP_PASSWORD } from "@constants/storage.constants";
+import { Keyboard, TouchableWithoutFeedback } from "react-native";
 
 export class UsuariosBiometriaDTO {
   [prop: string]: boolean;
@@ -180,101 +182,107 @@ export const LoginScreen: React.FC = () => {
   return (
     <SafeAreaView>
       <StatusBar backgroundColor={colors.secondary[600]} />
-      <VStack height={"100%"}>
-        <Center>
-          <Heading mt={40} mb={38}>
-            Gerencia suas <Text color="emerald.500">contas</Text> com este app
-          </Heading>
-        </Center>
-        <Center w={"100%"} mb={0}>
-          <FormControl isInvalid={!!errors.email} w={"90%"}>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, value } }) => (
-                <>
-                  <FormControl.Label>Email</FormControl.Label>
-                  <Input
-                    placeholder="Digite seu email"
-                    size={"lg"}
-                    onChangeText={onChange}
-                    value={value}
-                    backgroundColor={"white"}
-                    InputLeftElement={
-                      <Icon
-                        as={MaterialIcons}
-                        name={"person"}
-                        size={22}
-                        ml={2}
-                      />
-                    }
-                  />
-                  {errors?.email && (
-                    <FormControl.ErrorMessage
-                      leftIcon={<WarningOutlineIcon size="xs" />}
-                    >
-                      {errors?.email?.message}
-                    </FormControl.ErrorMessage>
-                  )}
-                </>
-              )}
-            />
-          </FormControl>
-          <FormControl w={"90%"} isInvalid={!!errors.senha} mt={5}>
-            <Controller
-              control={control}
-              name="senha"
-              render={({ field: { onChange, value } }) => (
-                <>
-                  <FormControl.Label>Senha</FormControl.Label>
-                  <Input
-                    placeholder="Digite sua senha"
-                    onChangeText={onChange}
-                    value={value}
-                    size={"lg"}
-                    backgroundColor={"white"}
-                    type={showPassword ? "text" : "password"}
-                    InputLeftElement={
-                      <Icon as={MaterialIcons} name={"lock"} size={22} ml={2} />
-                    }
-                    InputRightElement={
-                      <Pressable mr={2}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <VStack height={"100%"}>
+          <Center>
+            <Heading mt={40} mb={38}>
+              Gerencia suas <Text color="emerald.500">contas</Text> com este app
+            </Heading>
+          </Center>
+          <Center w={"100%"} mb={0}>
+            <FormControl isInvalid={!!errors.email} w={"90%"}>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, value } }) => (
+                  <>
+                    <FormControl.Label>Email</FormControl.Label>
+                    <Input
+                      placeholder="Digite seu email"
+                      size={"lg"}
+                      onChangeText={onChange}
+                      value={value}
+                      backgroundColor={"white"}
+                      InputLeftElement={
                         <Icon
-                          as={Feather}
-                          name={showPassword ? "eye-off" : "eye"}
+                          as={MaterialIcons}
+                          name={"person"}
                           size={22}
-                          onPress={() => setShowPassword(!showPassword)}
+                          ml={2}
                         />
-                      </Pressable>
-                    }
-                  />
-                  {errors?.senha && (
-                    <FormControl.ErrorMessage
-                      leftIcon={<WarningOutlineIcon size="xs" />}
-                    >
-                      {errors?.senha?.message}
-                    </FormControl.ErrorMessage>
-                  )}
-                </>
-              )}
-            />
-          </FormControl>
-        </Center>
+                      }
+                    />
+                    {errors?.email && (
+                      <FormControl.ErrorMessage
+                        leftIcon={<WarningOutlineIcon size="xs" />}
+                      >
+                        {errors?.email?.message}
+                      </FormControl.ErrorMessage>
+                    )}
+                  </>
+                )}
+              />
+            </FormControl>
+            <FormControl w={"90%"} isInvalid={!!errors.senha} mt={5}>
+              <Controller
+                control={control}
+                name="senha"
+                render={({ field: { onChange, value } }) => (
+                  <>
+                    <FormControl.Label>Senha</FormControl.Label>
+                    <Input
+                      placeholder="Digite sua senha"
+                      onChangeText={onChange}
+                      value={value}
+                      size={"lg"}
+                      backgroundColor={"white"}
+                      type={showPassword ? "text" : "password"}
+                      InputLeftElement={
+                        <Icon
+                          as={MaterialIcons}
+                          name={"lock"}
+                          size={22}
+                          ml={2}
+                        />
+                      }
+                      InputRightElement={
+                        <Pressable mr={2}>
+                          <Icon
+                            as={Feather}
+                            name={showPassword ? "eye-off" : "eye"}
+                            size={22}
+                            onPress={() => setShowPassword(!showPassword)}
+                          />
+                        </Pressable>
+                      }
+                    />
+                    {errors?.senha && (
+                      <FormControl.ErrorMessage
+                        leftIcon={<WarningOutlineIcon size="xs" />}
+                      >
+                        {errors?.senha?.message}
+                      </FormControl.ErrorMessage>
+                    )}
+                  </>
+                )}
+              />
+            </FormControl>
+          </Center>
 
-        <Center>
-          <Button
-            size={50}
-            fontSize={"lg"}
-            width={"90%"}
-            mt={8}
-            onPress={handleSubmit(handleOnSubmit)}
-            isLoading={loading}
-          >
-            Login
-          </Button>
-        </Center>
-      </VStack>
-
+          <Center>
+            <Button
+              size={50}
+              fontSize={"lg"}
+              width={"90%"}
+              mt={8}
+              onPress={handleSubmit(handleOnSubmit)}
+              isLoading={loading}
+            >
+              Login
+            </Button>
+          </Center>
+        </VStack>
+      </TouchableWithoutFeedback>
       <AlertDialog
         leastDestructiveRef={cancelRef}
         isOpen={isBiometricWarningOpen}
@@ -312,48 +320,6 @@ export const LoginScreen: React.FC = () => {
           </AlertDialog.Footer>
         </AlertDialog.Content>
       </AlertDialog>
-      {/* <VStack
-        height={"100%"}
-        display={"flex"}
-        justifyContent={"center"}
-        alignContent={"center"}
-        alignItems={"center"}
-      >
-        <Center mb={8}>
-          <Heading>
-            Gerencia suas <Text color="emerald.500">contas</Text> com este app
-          </Heading>
-        </Center>
-        <Center w={"100%"} mb={0}>
-          <FormControl isInvalid w={"90%"}>
-            <FormControl.Label>Email</FormControl.Label>
-            <Input
-              placeholder="Digite seu email"
-              size={"lg"}
-              {...register("email")}
-            />
-            <FormControl.ErrorMessage
-              leftIcon={<WarningOutlineIcon size="xs" />}
-            >
-              Try different from previous passwords.
-            </FormControl.ErrorMessage>
-
-            <FormControl.Label>Senha</FormControl.Label>
-            <Input
-              placeholder="Digite sua senha"
-              size={"lg"}
-              {...register("email")}
-            />
-            <FormControl.ErrorMessage
-              leftIcon={<WarningOutlineIcon size="xs" />}
-            >
-              Try different from previous passwords.
-            </FormControl.ErrorMessage>
-          </FormControl>
-        </Center>
-
-        <Button onPress={handleOnSubmit}>Login</Button>
-      </VStack> */}
     </SafeAreaView>
   );
 };

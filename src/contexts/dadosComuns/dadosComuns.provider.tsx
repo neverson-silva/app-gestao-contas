@@ -29,6 +29,7 @@ type DadosComunsContextData = {
     current: MesAnoData;
     selected: MesAnoData;
     changeSelected: (mes: number, ano: number) => void;
+    changeSelectedFromDate: (date: Date | moment.Moment) => void;
     meses: Array<{ id: number; nome: string; nomeAbreviado: string }>;
   };
   people: Pessoa[];
@@ -181,6 +182,16 @@ export const DadosComunsProvider: React.FC<PropsWithChildren<any>> = ({
       current: currentMonth,
       selected: selectedMonth,
       changeSelected: (mes: number, ano: number) => {
+        setSelectedMesAno({
+          mes,
+          ano,
+        });
+      },
+      changeSelectedFromDate: (pDate: Date | moment.Moment) => {
+        const mes = moment(pDate).month() + 1;
+        const ano = moment(pDate).year();
+
+        console.log("alterou mes e ano", mes, ano, pDate);
         setSelectedMesAno({
           mes,
           ano,
