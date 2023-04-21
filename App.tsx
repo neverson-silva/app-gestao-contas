@@ -1,5 +1,16 @@
 import React from "react";
-
+import {
+  useFonts,
+  Inter_100Thin,
+  Inter_200ExtraLight,
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from "@expo-google-fonts/inter";
 import { NavigationContainer } from "@react-navigation/native";
 import "react-native-gesture-handler";
 import { Routes } from "@routes/routes";
@@ -12,7 +23,53 @@ import { DadosComunsProvider } from "@contexts/dadosComuns/dadosComuns.provider"
 moment.locale("pt-br");
 
 export default function App() {
+  let [fontsLoaded] = useFonts({
+    Inter_100Thin,
+    Inter_200ExtraLight,
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
+  });
+
+  if (!fontsLoaded) {
+    return <></>;
+  }
   const theme = extendTheme({
+    fontConfig: {
+      Inter: {
+        100: {
+          normal: "Inter_100Thin",
+        },
+        200: {
+          normal: "Inter_200ExtraLight",
+        },
+        300: {
+          normal: "Inter_300Light",
+        },
+        400: {
+          normal: "Inter_400Regular",
+        },
+        500: {
+          normal: "Inter_500Medium",
+        },
+        600: {
+          normal: "Inter_600SemiBold",
+        },
+        700: {
+          normal: "Inter_700Bold",
+        },
+        800: {
+          normal: "Inter_800ExtraBold",
+        },
+        900: {
+          normal: "Inter_900Black",
+        },
+      },
+    },
     colors: {
       secondary: {
         50: "#f0fdfa",
@@ -54,6 +111,11 @@ export default function App() {
     config: {
       // Changing initialColorMode to 'dark'
       initialColorMode: "light",
+    },
+    fonts: {
+      heading: "Inter",
+      body: "Inter",
+      mono: "Inter",
     },
   });
 
