@@ -1,15 +1,11 @@
-import { Button, Icon, useTheme } from "native-base";
+import { useTheme } from "native-base";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HomeScreen } from "@screens/Home";
-import {
-  ROUTE_FATURAS,
-  ROUTE_HOME,
-  ROUTE_HOME_ROUTES,
-  ROUTE_LANCAMENTOS,
-} from "@constants/routes.constants";
+
 import { Feather } from "@expo/vector-icons";
 import { HomeRoutes } from "./home.routes";
+import { ERoutes } from "@models/routes.enum";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +27,7 @@ export const MainRoutes: React.FC = () => {
       }}
     >
       <Tab.Screen
-        name={ROUTE_HOME_ROUTES}
+        name={ERoutes.ROUTE_HOME_ROUTES}
         component={HomeRoutes}
         options={{
           title: "Início",
@@ -42,7 +38,7 @@ export const MainRoutes: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name={ROUTE_LANCAMENTOS}
+        name={ERoutes.ROUTE_LANCAMENTOS}
         component={HomeScreen}
         options={{
           title: "Lançamentos",
@@ -53,7 +49,7 @@ export const MainRoutes: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name={ROUTE_FATURAS}
+        name={ERoutes.ROUTE_FATURAS}
         component={HomeScreen}
         options={{
           title: "Faturas",

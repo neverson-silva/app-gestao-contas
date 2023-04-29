@@ -14,7 +14,6 @@ import { useAuth } from "@contexts/auth/useAuth";
 import { AlertDialog, Button, Center, Skeleton, VStack } from "native-base";
 import { api } from "@utils/api";
 import { AxiosError } from "axios";
-import { delay } from "@utils/util";
 
 type MesAnoData = {
   value: MesAnoDto;
@@ -146,15 +145,24 @@ export const DadosComunsProvider: React.FC<PropsWithChildren<any>> = ({
     }
   };
 
+  const getMesNumber = (pMes: number): string => {
+    return pMes <= 9 ? `0${pMes}` : pMes.toString();
+  };
+
   const currentMonth: MesAnoData = useMemo(() => {
     if (mesAnoAtual) {
       return {
         value: mesAnoAtual,
         toDate: () =>
-          moment(`${mesAnoAtual.ano}-${mesAnoAtual.mes}-01`).toDate(),
-        toMoment: () => moment(`${mesAnoAtual.ano}-${mesAnoAtual.mes}-01`),
+          moment(
+            `${mesAnoAtual.ano}-${getMesNumber(mesAnoAtual.mes)}-01`
+          ).toDate(),
+        toMoment: () =>
+          moment(`${mesAnoAtual.ano}-${getMesNumber(mesAnoAtual.mes)}-01`),
         format: (formato = "DD [de] MMMM [de] YYYY") =>
-          moment(`${mesAnoAtual.ano}-${mesAnoAtual.mes}-01`).format(formato),
+          moment(
+            `${mesAnoAtual.ano}-${getMesNumber(mesAnoAtual.mes)}-01`
+          ).format(formato),
       };
     }
     return {} as any;
@@ -165,13 +173,18 @@ export const DadosComunsProvider: React.FC<PropsWithChildren<any>> = ({
       return {
         value: selectedMesAno,
         toDate: () =>
-          moment(`${selectedMesAno.ano}-${selectedMesAno.mes}-01`).toDate(),
+          moment(
+            `${selectedMesAno.ano}-${getMesNumber(selectedMesAno.mes)}-01`
+          ).toDate(),
         toMoment: () =>
-          moment(`${selectedMesAno.ano}-${selectedMesAno.mes}-01`),
-        format: (formato = "DD [de] MMMM [de] YYYY") =>
-          moment(`${selectedMesAno.ano}-${selectedMesAno.mes}-01`).format(
-            formato
+          moment(
+            `${selectedMesAno.ano}-${getMesNumber(selectedMesAno.mes)}-01`
           ),
+        format: (formato = "DD [de] MMMM [de] YYYY") => {
+          return moment(
+            `${selectedMesAno.ano}-${getMesNumber(selectedMesAno.mes)}-01`
+          ).format(formato);
+        },
       };
       return {} as any;
     }
@@ -191,7 +204,6 @@ export const DadosComunsProvider: React.FC<PropsWithChildren<any>> = ({
         const mes = moment(pDate).month() + 1;
         const ano = moment(pDate).year();
 
-        console.log("alterou mes e ano", mes, ano, pDate);
         setSelectedMesAno({
           mes,
           ano,

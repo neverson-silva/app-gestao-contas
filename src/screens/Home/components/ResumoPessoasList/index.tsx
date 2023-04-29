@@ -1,6 +1,9 @@
 import { Esqueleto } from "@components/Esqueleto";
+
 import { useDadosComuns } from "@contexts/dadosComuns/useDadosComuns";
 import { ResumoFaturaPessoas } from "@models/resumoFatura";
+import { ERoutes } from "@models/routes.enum";
+import { useNavigation } from "@react-navigation/native";
 import { api } from "@utils/api";
 import { formatarMoeda } from "@utils/util";
 import {
@@ -17,9 +20,17 @@ import {
 } from "native-base";
 import React, { useEffect, useState } from "react";
 
-export const ResumoPessoasList: React.FC = () => {
+type ResumoPessoaListProps = {
+  refreshing?: boolean;
+};
+
+export const ResumoPessoasList: React.FC<ResumoPessoaListProps> = ({
+  refreshing,
+}) => {
   const [loading, setLoading] = useState(false);
   const [resumos, setResumos] = useState<ResumoFaturaPessoas[]>([]);
+
+  const navigation = useNavigation();
 
   const {
     date: { selected },
@@ -46,9 +57,20 @@ export const ResumoPessoasList: React.FC = () => {
     }
   };
 
+  const handleOnPressItem = (item: ResumoFaturaPessoas) => {
+    navigation.navigate(ERoutes.ROUTE_DETALHES_FATURA_PESSOA, {
+      resumo: item,
+    });
+  };
   useEffect(() => {
     buscarResumosPessoasPorPeriodo();
   }, [selected]);
+
+  useEffect(() => {
+    if (refreshing && selected) {
+      buscarResumosPessoasPorPeriodo();
+    }
+  }, [refreshing]);
   return (
     <Box>
       {loading ? (
@@ -58,7 +80,7 @@ export const ResumoPessoasList: React.FC = () => {
           data={resumos}
           renderItem={({ item }) => (
             <Pressable
-              onPress={() => console.log("oi item", item)}
+              onPress={() => handleOnPressItem(item)}
               backgroundColor={"yellow"}
               width={"100%"}
             >

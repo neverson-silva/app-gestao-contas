@@ -1,62 +1,52 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import {
-  View,
-  ScrollView,
   Text,
-  useTheme,
   Box,
   HStack,
   Heading,
   Icon,
   VStack,
   Divider,
+  Spinner,
 } from "native-base";
-import { SafeAreaView, Animated, Pressable } from "react-native";
+import { Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "@contexts/auth/useAuth";
-import { Card } from "@components/Card";
-
-const Header_Max_Height = 180;
-const Header_Min_Height = 50;
+import { Bloco } from "@components/Bloco";
+import { formatarMoeda } from "@utils/util";
 
 type HomeHeaderProps = {
-  scrollOffsetY: Animated.Value;
+  valor: number;
+  porcentagem: number;
+  loading: boolean;
 };
-
-export const HomeHeader: React.FC<HomeHeaderProps> = ({ scrollOffsetY }) => {
-  const { colors } = useTheme();
-
+export const HomeHeader: React.FC<HomeHeaderProps> = ({
+  valor,
+  porcentagem,
+  loading,
+}) => {
   const {
     usuario: { pessoa },
   } = useAuth();
 
-  const animateHeaderBackgroundColor = scrollOffsetY.interpolate({
-    inputRange: [0, Header_Max_Height - Header_Min_Height],
-    outputRange: [colors.primary[500], colors.primary[500]],
-    extrapolate: "clamp",
-  });
+  const getIconResumo = (pPorcentagem: number) => {
+    return pPorcentagem == 0
+      ? "check"
+      : pPorcentagem > 0
+      ? "thumbs-down"
+      : "thumbs-up";
+  };
 
-  const animateHeaderHeight = scrollOffsetY.interpolate({
-    inputRange: [0, Header_Max_Height - Header_Min_Height],
-    outputRange: [Header_Max_Height, Header_Min_Height],
-    extrapolate: "clamp",
-  });
-
-  const animatedCardHeight = scrollOffsetY.interpolate({
-    inputRange: [0, 20 - 10],
-    outputRange: [20, -10],
-    extrapolate: "clamp",
-  });
+  const getIconColorResumo = (pPorcentagem: number) => {
+    return pPorcentagem == 0
+      ? "muted.500"
+      : pPorcentagem > 0
+      ? "danger.500"
+      : "success.500";
+  };
 
   return (
-    <Animated.View
-      style={[
-        {
-          height: animateHeaderHeight,
-          // backgroundColor: animateHeaderBackgroundColor,
-        },
-      ]}
-    >
+    <Box bg={"primary.500"} height={120} mb={55}>
       <Box width={"100%"} p={4}>
         <HStack justifyContent={"space-between"}>
           <Box>
@@ -71,15 +61,48 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({ scrollOffsetY }) => {
           </Box>
         </HStack>
       </Box>
-      <VStack position={"absolute"} top={130} width={"full"} px={3}>
-        <Box borderRadius="md" bgColor={"white"} p={4}>
-          <VStack space="4" divider={<Divider />}>
-            <Box px="4" pt="4">
-              NativeBase
-            </Box>
-          </VStack>
-        </Box>
-      </VStack>
-    </Animated.View>
+      <Box px={3} position={"absolute"} width={"full"} top={70}>
+        <Bloco
+          borderRadius="md"
+          bgColor={"white"}
+          p={4}
+          minHeight={90}
+          shadow={2}
+          _pressed={{
+            backgroundColor: "muted.100",
+          }}
+        >
+          {loading ? (
+            <Spinner size={"lg"} mt={2} color={"secondary.500"} />
+          ) : (
+            <HStack justifyContent={"space-between"} px={2}>
+              <VStack>
+                <Text mb={1}>Gastos</Text>
+                <Heading size={"md"}>{formatarMoeda(valor)}</Heading>
+              </VStack>
+              <VStack
+                justifyContent={"flex-end"}
+                alignContent={"flex-end"}
+                alignItems={"flex-end"}
+                ml={45}
+                pl={30}
+              >
+                <HStack space={2} pl={4}>
+                  <Icon
+                    as={Feather}
+                    name={getIconResumo(porcentagem)}
+                    size={5}
+                    color={getIconColorResumo(porcentagem)}
+                  />
+                  <Heading size={"md"} color={getIconColorResumo(porcentagem)}>
+                    {porcentagem.toFixed(2).replace(".", ",")} %
+                  </Heading>
+                </HStack>
+              </VStack>
+            </HStack>
+          )}
+        </Bloco>
+      </Box>
+    </Box>
   );
 };

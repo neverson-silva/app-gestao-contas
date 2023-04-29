@@ -9,15 +9,6 @@ import {
   HStack,
   Divider,
   Box,
-  Skeleton,
-  Icon,
-  Flex,
-  Stack,
-  Pressable,
-  Modal,
-  ScrollView,
-  AlertDialog,
-  Button,
 } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import { Feather } from "@expo/vector-icons";

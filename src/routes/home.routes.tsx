@@ -1,7 +1,4 @@
-import {
-  ROUTE_DETALHES_FATURA_PESSOA,
-  ROUTE_HOME,
-} from "@constants/routes.constants";
+import { ERoutes } from "@models/routes.enum";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { DetalhesFaturaMesPessoaScreen } from "@screens/DetalhesFaturaMesPessoa";
 import { HomeScreen } from "@screens/Home";
@@ -16,9 +13,9 @@ export const HomeRoutes: React.FC = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name={ROUTE_HOME} component={HomeScreen} />
+      <Stack.Screen name={ERoutes.ROUTE_HOME} component={HomeScreen} />
       <Stack.Screen
-        name={ROUTE_DETALHES_FATURA_PESSOA}
+        name={ERoutes.ROUTE_DETALHES_FATURA_PESSOA}
         component={DetalhesFaturaMesPessoaScreen}
       />
     </Stack.Navigator>

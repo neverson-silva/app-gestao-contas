@@ -15,6 +15,7 @@ import React, {
 import jwtDecode from "jwt-decode";
 import { api } from "@utils/api";
 import { Usuario } from "@models/auth";
+import moment from "moment";
 
 type AuthContextData = {
   usuario: Usuario;
@@ -70,15 +71,32 @@ export const AuthProvider: React.FC<PropsWithChildren<any>> = ({
 
   const isAdmin = useMemo(() => temPermissao("ROLE_ADMIN"), [usuario]);
 
-  useEffect(() => {
-    getStoredItem(STORAGE_APP_TOKEN).then((token) => {
-      if (token) {
+  const checkIsLogado = async () => {
+    const token = await getStoredItem(STORAGE_APP_TOKEN);
+    const expiresIn = await getStoredItem(STORAGE_APP_DATA_VALIDADE_TOKEN);
+
+    let deslogar = false;
+    if (!token) {
+      deslogar = true;
+    }
+    
+    if (expiresIn && moment().isSameOrAfter(expiresIn)) {
+      deslogar = true
+    }
+
+    if (deslogar) {
+      await logout()
+    } else {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const parsed = jwtDecode(token)?.usuario as unknown as Usuario;
         setUsuario(parsed);
-      }
-    });
+    }
+
+  }
+
+  useEffect(() => {
+    checkIsLogado()
   }, []);
 
   return (

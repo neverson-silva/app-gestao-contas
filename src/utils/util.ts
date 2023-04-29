@@ -54,3 +54,7 @@ export const delay = (time: number) => {
     setTimeout(resolve, time);
   });
 };
+
+
+export const beautyNumber = (numero?: number) =>
+	Number(numero ?? 0) <= 9 ? `0${Number(numero)}` : Number(numero)

@@ -1,93 +1,13 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import {
-  View,
-  Text,
-  Button,
-  Center,
-  StatusBar,
-  useTheme,
-  ScrollView,
-  Box,
-  Container,
-  HStack,
-  Heading,
-  Icon,
-  Pressable,
-  Image,
-  Menu,
-  HamburgerIcon,
-} from "native-base";
+import { StatusBar, useTheme, ScrollView } from "native-base";
 
-import { ResumoContaMes } from "./components/ResumoContaMes";
 import { useAuth } from "@contexts/auth/useAuth";
 import { ResumoPessoasList } from "./components/ResumoPessoasList";
-import { LogBox, Animated, SafeAreaView } from "react-native";
-import { Usuario } from "@models/auth";
-import { Feather } from "@expo/vector-icons";
+import { LogBox, Animated, SafeAreaView, RefreshControl } from "react-native";
 import { HomeHeader } from "./components/HomeHeader";
-
-export const DATA = [
-  {
-    id: 1,
-    title: "Modern JS: A curated collection",
-  },
-  {
-    id: 2,
-    title: "JavaScript notes for professionals",
-  },
-  {
-    id: 3,
-    title: "JavaScript: The Good Parts",
-  },
-  {
-    id: 4,
-    title: "JavaScript: The right way",
-  },
-  {
-    id: 5,
-    title: "Exploring ES6",
-  },
-  {
-    id: 6,
-    title: "JavaScript Enlightenment",
-  },
-  {
-    id: 7,
-    title: "You dont know JS",
-  },
-  {
-    id: 8,
-    title: "Learn JavaScript",
-  },
-  {
-    id: 9,
-    title: "JavaScript succintly",
-  },
-  {
-    id: 10,
-    title: "Human JavaScript",
-  },
-  {
-    id: 11,
-    title: "JavaScript design patterns",
-  },
-  {
-    id: 12,
-    title: "JS50: 50 illustrations in JS",
-  },
-  {
-    id: 13,
-    title: "Eloqent JavaScript",
-  },
-  {
-    id: 14,
-    title: "Practical ES6",
-  },
-  {
-    id: 15,
-    title: "Speaking JavaScript",
-  },
-];
+import { ResumoFormaPagamentosDTO } from "@models/resumosFormasPagamento";
+import { api } from "@utils/api";
+import { useDadosComuns } from "@contexts/dadosComuns/useDadosComuns";
 
 export const HomeScreen: React.FC = () => {
   const { colors } = useTheme();
@@ -95,43 +15,92 @@ export const HomeScreen: React.FC = () => {
     logout,
     usuario: { pessoa },
   } = useAuth();
+  const {
+    date: { selected, current, changeSelected },
+  } = useDadosComuns();
 
   let scrollOffsetY = useRef(new Animated.Value(0)).current;
+
+  const [resumoFormasPagamentos, setResumoFormasPagamentos] = useState<
+    undefined | ResumoFormaPagamentosDTO
+  >();
+  const [loadingBalance, setLoadingBalance] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const buscarResumoMes = async () => {
+    try {
+      const { data } = await api.get<ResumoFormaPagamentosDTO>(
+        `dashboard/resumo-pagamentos/${pessoa.id}`,
+        {
+          params: {
+            mesReferencia: selected.value.mes,
+            anoReferencia: selected.value.ano,
+          },
+        }
+      );
+      setResumoFormasPagamentos(data);
+    } catch (e) {
+      console.log("erro ao buscar dados", e);
+    }
+  };
 
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
   }, []);
 
+  const handleLoadingData = async () => {
+    setLoadingBalance(true);
+    await buscarResumoMes();
+    setLoadingBalance(false);
+  };
+
+  const handleRefreshData = async () => {
+    setRefreshing(true);
+    await buscarResumoMes();
+    setRefreshing(false);
+  };
+  useEffect(() => {
+    handleLoadingData();
+  }, [selected]);
+
+  const LocalStickyHeader = useMemo(() => {
+    return () => (
+      <HomeHeader
+        valor={resumoFormasPagamentos?.total?.valor ?? 0}
+        porcentagem={resumoFormasPagamentos?.total?.porcentagem ?? 0}
+        loading={loadingBalance || refreshing}
+      />
+    );
+  }, [resumoFormasPagamentos, loadingBalance, refreshing]);
+
   return (
     <SafeAreaView>
       <StatusBar backgroundColor={colors.primary[500]} />
-      <HomeHeader scrollOffsetY={scrollOffsetY} />
 
       <ScrollView
+        nestedScrollEnabled={true}
         style={{
-          marginTop: 50,
+          marginTop: 0,
         }}
         scrollEventThrottle={16}
+        StickyHeaderComponent={LocalStickyHeader}
+        stickyHeaderIndices={[0]}
+        showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }],
           { useNativeDriver: false }
         )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefreshData}
+          />
+        }
       >
-        {DATA.map((book, index) => {
-          return (
-            <Text
-              style={{
-                fontSize: 19,
-                textAlign: "center",
-                padding: 20,
-                color: "#000",
-              }}
-              key={book.id}
-            >
-              {book.title}
-            </Text>
-          );
-        })}
+        <></>
+        <ScrollView>
+          <ResumoPessoasList refreshing={refreshing} />
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
