@@ -1,49 +1,72 @@
 import { useDadosComuns } from "@contexts/dadosComuns/useDadosComuns";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { beautyNumber, formatarData, formatarMoeda } from "@utils/util";
+import { formatarMoeda } from "@utils/util";
 import {
   Avatar,
   Box,
   HStack,
   Text,
   VStack,
-  Icon,
   ScrollView,
-  SectionList,
-  FlatList,
-  Spinner,
-  Divider,
-  Pressable,
+  Button,
 } from "native-base";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DetalheFaturaPessoasScreenProp } from "src/@types/navigation";
-import { Ionicons } from "@expo/vector-icons";
-import { Animated } from "react-native";
+
+import { Dimensions } from "react-native";
 import { LogBox } from "react-native";
 import { BuscarItensFatura, FaturaItem, Pessoa } from "@models/faturaItem";
 import { IPagination } from "@models/pagination";
 import { api } from "@utils/api";
 import { Esqueleto } from "@components/Esqueleto";
+import Reanimated, { FadeInDown } from "react-native-reanimated";
+import { ItemLancamentoFatura } from "@components/ItemLancamentoFatura";
+import { ERoutes } from "@models/routes.enum";
+import { TotalMesPessoaDataset } from "@models/dadosGraficoMensal";
+import { GraficoGastoMensal } from "./compontents/GraficoGastoMensal";
 
 export const DetalhesFaturaMesPessoaScreen: React.FC = () => {
+  const scrollViewRef = useRef();
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0);
+
   const {
     params: { resumo },
   } = useRoute<DetalheFaturaPessoasScreenProp>();
   const navigation = useNavigation();
 
   const {
-    date: { selected },
+    date: { selected, current },
   } = useDadosComuns();
 
   const [pager, setPager] = useState<IPagination>({
     current: 1,
-    pageSize: 10,
+    pageSize: 5,
   });
   const [lancamentos, setLancamentos] = useState<FaturaItem[]>([]);
+  const [barchartData, setBarchartData] = useState<TotalMesPessoaDataset[]>([]);
 
   const [loading, setLoading] = useState(false);
+  const [loadingChart, setLoadingChart] = useState(false);
 
-  let scrollOffsetY = useRef(new Animated.Value(0)).current;
+  const buscarDadosGrafico = async () => {
+    try {
+      setLoadingChart(true);
+      const { data } = await api.get<TotalMesPessoaDataset[]>(
+        `dashboard/grafico/gastos-por-pessoa/${resumo.pessoa.id}`,
+        {
+          params: {
+            mesReferencia: selected.value.mes,
+            anoReferencia: selected.value.ano,
+          },
+        }
+      );
+      console.log("data", data);
+      setBarchartData(data);
+    } finally {
+      setLoadingChart(false);
+    }
+  };
 
   const buscarFaturaPessoa = async (
     pIdPessoa: number,
@@ -59,8 +82,8 @@ export const DetalhesFaturaMesPessoaScreen: React.FC = () => {
             idPessoa: pIdPessoa,
             page: page ?? pager?.current,
             linesPerPage: size ?? pager?.pageSize,
-            mes: selected.value.mes,
-            ano: selected.value.ano,
+            mes: current.value.mes,
+            ano: current.value.ano,
           },
         }
       );
@@ -75,22 +98,16 @@ export const DetalhesFaturaMesPessoaScreen: React.FC = () => {
     } catch (e) {
       setLancamentos([]);
       console.log(e);
-      // notification.error({
-      //   description: "Ocorreu um erro",
-      //   message: "Tente novamente mais tarde",
-      // });
     } finally {
       setLoading(false);
     }
   };
 
-  const getNomeLancamento = (faturaItem: FaturaItem) => {
-    if (faturaItem.parcelado) {
-      return `${faturaItem.nome} - ${beautyNumber(
-        faturaItem.parcela?.numero
-      )}/${beautyNumber(faturaItem.lancamento.quantidadeParcelas)}`;
-    }
-    return faturaItem.lancamento.nome;
+  const handlePressItem = (faturaItem: FaturaItem) => {
+    navigation.navigate(ERoutes.ROUTE_DETALHE_LANCAMENTO, {
+      idLancamento: faturaItem.lancamento.id,
+      compraNome: faturaItem.nome,
+    });
   };
 
   useEffect(() => {
@@ -99,125 +116,113 @@ export const DetalhesFaturaMesPessoaScreen: React.FC = () => {
 
   useEffect(() => {
     buscarFaturaPessoa(resumo.pessoa.id, 1, 5);
+    buscarDadosGrafico();
   }, [resumo]);
 
-  const LocalStickyHeader = useMemo(() => {
-    return () => {
-      return (
-        <VStack
-          justifyContent={"center"}
-          alignItems={"center"}
-          alignContent={"center"}
-          // p={4}
-        >
-          <HStack pt={0}>
-            <Avatar
-              source={{ uri: resumo.pessoa.perfil }}
-              size={120}
-              shadow={5}
-            />
-          </HStack>
-          <Text fontSize={19} fontFamily={"Inter_600SemiBold"} mt={4}>
-            {resumo.pessoa.nome} {resumo.pessoa.sobrenome}
-          </Text>
-          <Text color={"muted.600"}>
-            {formatarMoeda(resumo.valorMesAtual)} em{" "}
-            {selected.format("MMMM [de] YYYY")}
-          </Text>
-        </VStack>
-      );
-    };
-  }, [resumo]);
+  useLayoutEffect(() => {
+    const screenHeight = Math.round(Dimensions.get("window").height);
+    setScrollViewHeight(screenHeight - headerHeight);
+  }, [headerHeight]);
 
   return (
     <Box>
-      <Icon
-        as={Ionicons}
-        name="ios-arrow-back"
-        size={35}
-        color={"primary.500"}
-        m={2}
-        mb={0}
-        alignSelf={"flex-start"}
-        onPress={() => navigation.goBack()}
-      />
-      <ScrollView
-        StickyHeaderComponent={LocalStickyHeader}
-        stickyHeaderIndices={[0]}
-        showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }],
-          { useNativeDriver: false }
-        )}
+      <VStack
+        justifyContent={"center"}
+        alignItems={"center"}
+        alignContent={"center"}
+        pt={6}
+        pb={4}
+        onLayout={(event) => setHeaderHeight(event.nativeEvent.layout.height)}
       >
-        <></>
+        <Reanimated.View entering={FadeInDown.duration(400)}>
+          <HStack pt={0}>
+            <Avatar
+              source={{ uri: resumo?.pessoa?.perfil }}
+              size={100}
+              shadow={5}
+            />
+          </HStack>
+        </Reanimated.View>
+
+        <Text fontSize={17} fontFamily={"Inter_600SemiBold"} mt={4}>
+          {resumo?.pessoa?.nome} {resumo?.pessoa?.sobrenome}
+        </Text>
+        <Text
+          color={"muted.600"}
+          fontSize={13}
+          fontFamily={"heading"}
+          fontWeight={"semibold"}
+        >
+          {formatarMoeda(resumo?.valorMesAtual)}
+        </Text>
+      </VStack>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        ref={scrollViewRef}
+        style={{ height: scrollViewHeight }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: 150,
+        }}
+      >
+        <VStack mt={4}>
+          <Text py={3} ml={3} fontSize={16} fontFamily={"Inter_600SemiBold"}>
+            Últimos meses
+          </Text>
+          <GraficoGastoMensal loading={loadingChart} dados={barchartData} />
+        </VStack>
         <VStack mt={4}>
           <Text py={3} ml={3} fontSize={16} fontFamily={"Inter_600SemiBold"}>
             Pendências
           </Text>
-          <Box background={"white"} width={"full"}>
-            {resumo.resumos.map((res, index) => {
-              return (
+          {resumo.resumos.map((item, index) => {
+            return (
+              <Box background={"white"} width={"full"} mb={1} key={index}>
                 <HStack
-                  borderBottomColor={"muted.400"}
-                  borderBottomWidth={
-                    index + 1 === resumo.resumos.length ? 0 : 0.3
-                  }
                   py={4}
                   justifyContent={"space-between"}
                   mx={3}
                   key={index}
                 >
-                  <Text fontSize={13}>{res.formaPagamento.nome}</Text>
-                  <Text fontSize={13}>{formatarMoeda(res.valorTotal)}</Text>
+                  <Text fontSize={13} fontFamily={"heading"} fontWeight={500}>
+                    {item.formaPagamento.nome}
+                  </Text>
+                  <Text fontSize={13}>{formatarMoeda(item.valorTotal)}</Text>
                 </HStack>
-              );
-            })}
-          </Box>
+              </Box>
+            );
+          })}
         </VStack>
         <VStack mt={4}>
-          <Text py={3} ml={3} fontSize={16} fontFamily={"Inter_600SemiBold"}>
-            Lançamentos
-          </Text>
+          <HStack
+            py={3}
+            mx={3}
+            display={"flex"}
+            justifyContent={"space-between"}
+          >
+            <Text fontSize={16} fontFamily={"Inter_600SemiBold"}>
+              Últimos Lançamentos
+            </Text>
+            {/* <Icon as={Feather} name="share" size={"md"} /> */}
+            <Button variant={"link"}>ver tudo</Button>
+          </HStack>
 
           {loading ? (
             <HStack backgroundColor={"white"}>
               <Esqueleto />
             </HStack>
           ) : (
-            <FlatList
-              data={lancamentos}
-              keyExtractor={(item: FaturaItem, index) => String(index)}
-              renderItem={({ item }) => {
-                return (
-                  <Pressable
-                    bg={"white"}
-                    px={4}
-                    py={3}
-                    display={"flex"}
-                    mb={1}
-                    onPress={() => console.log(item)}
-                  >
-                    <HStack justifyContent={"space-between"}>
-                      <Text fontWeight={"500"}>{item.nome}</Text>
-                      <Text fontWeight={"500"}>
-                        {formatarMoeda(item.valorUtilizado)}
-                      </Text>
-                    </HStack>
-                    <HStack justifyContent={"space-between"}>
-                      <Text fontSize={12} color={"gray.700"}>
-                        {formatarData(item.lancamento.dataCompra)}
-                      </Text>
-                      <Text>
-                        {item.parcelado
-                          ? `em ${item.lancamento.quantidadeParcelas} vezes`
-                          : "à vista"}
-                      </Text>
-                    </HStack>
-                  </Pressable>
-                );
-              }}
-            />
+            <>
+              {lancamentos.map((item) => (
+                <ItemLancamentoFatura
+                  item={item}
+                  key={item.id}
+                  onPressItem={handlePressItem}
+                />
+              ))}
+            </>
           )}
         </VStack>
       </ScrollView>

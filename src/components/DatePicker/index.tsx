@@ -66,7 +66,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       onClose={onClose}
     >
       <AlertDialog.Content width={350}>
-        <AlertDialog.Body>
+        <AlertDialog.Body bgColor={"white"}>
           <DatePickerModern
             mode={mode ?? "monthYear"}
             selectorStartingYear={selectorStartingYear ?? 2000}

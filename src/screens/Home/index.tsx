@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { StatusBar, useTheme, ScrollView } from "native-base";
+import { StatusBar, useTheme, ScrollView, Box } from "native-base";
 
 import { useAuth } from "@contexts/auth/useAuth";
 import { ResumoPessoasList } from "./components/ResumoPessoasList";
@@ -74,7 +74,7 @@ export const HomeScreen: React.FC = () => {
   }, [resumoFormasPagamentos, loadingBalance, refreshing]);
 
   return (
-    <SafeAreaView>
+    <Box>
       <StatusBar backgroundColor={colors.primary[500]} />
 
       <ScrollView
@@ -83,8 +83,8 @@ export const HomeScreen: React.FC = () => {
           marginTop: 0,
         }}
         scrollEventThrottle={16}
-        StickyHeaderComponent={LocalStickyHeader}
-        stickyHeaderIndices={[0]}
+        // StickyHeaderComponent={LocalStickyHeader}
+        // stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }],
@@ -97,12 +97,10 @@ export const HomeScreen: React.FC = () => {
           />
         }
       >
-        <></>
-        <ScrollView>
-          <ResumoPessoasList refreshing={refreshing} />
-        </ScrollView>
+        <LocalStickyHeader />
+        <ResumoPessoasList refreshing={refreshing} />
       </ScrollView>
-    </SafeAreaView>
+    </Box>
   );
 
   // return (

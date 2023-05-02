@@ -11,10 +11,8 @@ import {
   Box,
   FlatList,
   HStack,
-  Heading,
   Spacer,
   VStack,
-  View,
   Text,
   Pressable,
 } from "native-base";
@@ -76,80 +74,85 @@ export const ResumoPessoasList: React.FC<ResumoPessoaListProps> = ({
       {loading ? (
         <Esqueleto />
       ) : (
-        <FlatList
-          data={resumos}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => handleOnPressItem(item)}
-              backgroundColor={"yellow"}
-              width={"100%"}
-            >
-              {({ isPressed }) => {
-                return (
-                  <>
-                    <Box
-                      borderBottomWidth="1"
-                      _dark={{
-                        borderColor: "muted.50",
-                      }}
-                      borderBottomColor={"muted.200"}
-                      //   borderColor="muted.800"
-                      pl={["0", "4"]}
-                      pr={["0", "5"]}
-                      backgroundColor={isPressed ? "muted.200" : "white"}
-                      py="3"
-                      borderRadius={5}
-                    >
-                      <HStack
-                        space={[2, 3]}
-                        justifyContent="space-between"
-                        px={3}
+        <>
+          {resumos.map((item) => {
+            return (
+              <Pressable
+                onPress={() => handleOnPressItem(item)}
+                backgroundColor={"yellow"}
+                width={"100%"}
+                key={item.pessoa.id}
+              >
+                {({ isPressed }) => {
+                  return (
+                    <>
+                      <Box
+                        borderBottomWidth="1"
+                        _dark={{
+                          borderColor: "muted.50",
+                        }}
+                        borderBottomColor={"muted.200"}
+                        //   borderColor="muted.800"
+                        pl={["0", "4"]}
+                        pr={["0", "5"]}
+                        backgroundColor={isPressed ? "muted.200" : "white"}
+                        py="3"
+                        borderRadius={5}
                       >
-                        <Avatar
-                          size="48px"
-                          source={{
-                            uri: item.pessoa.perfil,
-                          }}
-                        />
-                        <VStack>
+                        <HStack
+                          space={[2, 3]}
+                          justifyContent="space-between"
+                          px={3}
+                        >
+                          <Avatar
+                            size="48px"
+                            source={{
+                              uri: item.pessoa.perfil,
+                            }}
+                          />
+                          <VStack>
+                            <Text
+                              _dark={{
+                                color: "warmGray.50",
+                              }}
+                              color="coolGray.800"
+                              fontWeight={"semibold"}
+                              fontFamily={"heading"}
+                            >
+                              {item.pessoa.nome} {item.pessoa.sobrenome}
+                            </Text>
+                            <Text
+                              color="coolGray.600"
+                              _dark={{
+                                color: "warmGray.200",
+                              }}
+                            >
+                              mês anterior{" "}
+                              {formatarMoeda(item.valorMesAnterior)}
+                            </Text>
+                          </VStack>
+                          <Spacer />
                           <Text
+                            fontSize="xs"
                             _dark={{
                               color: "warmGray.50",
                             }}
-                            color="coolGray.800"
-                            bold
+                            color="warmGray.600"
+                            alignSelf="flex-start"
+                            fontFamily={"heading"}
+                            fontWeight={"semibold"}
                           >
-                            {item.pessoa.nome} {item.pessoa.sobrenome}
+                            {formatarMoeda(item.valorMesAtual)}
                           </Text>
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: "warmGray.200",
-                            }}
-                          >
-                            mês anterior {formatarMoeda(item.valorMesAnterior)}
-                          </Text>
-                        </VStack>
-                        <Spacer />
-                        <Text
-                          fontSize="xs"
-                          _dark={{
-                            color: "warmGray.50",
-                          }}
-                          color="coolGray.800"
-                          alignSelf="flex-start"
-                        >
-                          {formatarMoeda(item.valorMesAtual)}
-                        </Text>
-                      </HStack>
-                    </Box>
-                  </>
-                );
-              }}
-            </Pressable>
-          )}
-          keyExtractor={(item) => item.pessoa.id.toString()}
-        />
+                        </HStack>
+                      </Box>
+                    </>
+                  );
+                }}
+              </Pressable>
+            );
+          })}
+        </>
       )}
     </Box>
   );

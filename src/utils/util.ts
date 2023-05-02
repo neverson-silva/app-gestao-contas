@@ -57,4 +57,21 @@ export const delay = (time: number) => {
 
 
 export const beautyNumber = (numero?: number) =>
-	Number(numero ?? 0) <= 9 ? `0${Number(numero)}` : Number(numero)
+	Number(numero ?? 0) <= 9 ? `0${Number(numero)}` : Number(numero);
+
+export const capitalizeFirstLetter =(value: string): string => {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+export const isValidValue = (value: unknown): boolean => {
+  if (typeof value === 'string') {
+    return value.trim().length > 0;
+  }
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value).length > 0;
+  }
+  return false;
+};

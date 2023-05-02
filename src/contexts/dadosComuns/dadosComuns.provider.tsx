@@ -14,6 +14,7 @@ import { useAuth } from "@contexts/auth/useAuth";
 import { AlertDialog, Button, Center, Skeleton, VStack } from "native-base";
 import { api } from "@utils/api";
 import { AxiosError } from "axios";
+import { LogBox } from "react-native";
 
 type MesAnoData = {
   value: MesAnoDto;
@@ -235,6 +236,12 @@ export const DadosComunsProvider: React.FC<PropsWithChildren<any>> = ({
       init();
     }
   }, [logado, usuario]);
+
+  useEffect(() => {
+    LogBox.ignoreLogs([
+      "Deprecation warning: value provided is not in a recognized RFC2822 or ISO format.",
+    ]);
+  }, []);
 
   const LoadingApp = () => {
     return (
