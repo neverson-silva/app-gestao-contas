@@ -4,9 +4,10 @@ import { Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "@contexts/auth/useAuth";
 import { Bloco } from "@components/Bloco";
-import { formatarMoeda } from "@utils/util";
+import { capitalizeFirstLetter, formatarMoeda } from "@utils/util";
 import { useDadosComuns } from "@contexts/dadosComuns/useDadosComuns";
-import { DatePicker } from "@components/DatePicker";
+import { MonthPicker } from "@components/Picker/MonthPicker";
+import moment from "moment";
 
 type HomeHeaderProps = {
   valor: number;
@@ -23,7 +24,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   } = useAuth();
 
   const {
-    date: { selected, changeSelected },
+    date: { selected, changeSelectedFromDate },
   } = useDadosComuns();
 
   const [showCalendar, setShowCalendar] = useState(false);
@@ -89,6 +90,10 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                   ml={45}
                   pl={30}
                 >
+                  <Text mb={1}>
+                    {capitalizeFirstLetter(selected.format("MMM/YYYY"))}
+                  </Text>
+
                   <HStack space={2} pl={4}>
                     <Icon
                       as={Feather}
@@ -110,14 +115,13 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
           </Bloco>
         </Box>
       </Box>
-      <DatePicker
+      <MonthPicker
+        onClose={() => setShowCalendar(false)}
         isOpen={showCalendar}
-        onClose={() => setShowCalendar(!showCalendar)}
-        mode="monthYear"
         current={selected.toDate()}
-        onMonthYearChange={(selectedDate: string) => {
-          const [ano, mes] = selectedDate?.split(" ");
-          changeSelected(Number(mes), Number(ano));
+        overlay={true}
+        onChangeMonth={(date) => {
+          changeSelectedFromDate(date);
         }}
       />
     </>

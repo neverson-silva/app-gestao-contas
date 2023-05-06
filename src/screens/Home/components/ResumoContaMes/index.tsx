@@ -9,6 +9,7 @@ import {
   HStack,
   Divider,
   Box,
+  Icon,
 } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import { Feather } from "@expo/vector-icons";
@@ -18,8 +19,9 @@ import {
 } from "@models/resumosFormasPagamento";
 import { useAuth } from "@contexts/auth/useAuth";
 import { api } from "@utils/api";
-import { DatePicker } from "@components/DatePicker";
 import { Esqueleto } from "@components/Esqueleto";
+import moment from "moment";
+import { MonthPicker } from "@components/Picker/MonthPicker";
 
 export const ResumoContaMes: React.FC = () => {
   const {
@@ -164,13 +166,14 @@ export const ResumoContaMes: React.FC = () => {
           </>
         )}
       </Box>
-      <DatePicker
+      <MonthPicker
         isOpen={showCalendar}
-        onClose={() => setShowCalendar(!showCalendar)}
-        mode="monthYear"
-        onMonthYearChange={(selectedDate: string) => {
-          const [ano, mes] = selectedDate?.split(" ");
+        current={selected.toDate()}
+        overlay={true}
+        onChangeMonth={(date) => {
+          const [ano, mes] = moment(date).format("MM YYYY")?.split(" ");
           changeSelected(Number(mes), Number(ano));
+          setShowCalendar(false);
         }}
       />
     </>

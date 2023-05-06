@@ -37,11 +37,10 @@ export const HomeRoutes: React.FC = () => {
       <Stack.Screen
         name={ERoutes.ROUTE_DETALHE_LANCAMENTO}
         component={DetalheLancamentoScreen}
-        options={({ route }) => ({
-          //@ts-ignore
-          title: route.params.compraNome,
-          headerShown: true,
-        })} // what
+        options={{
+          headerShown: false,
+          title: "Detalhes",
+        }}
       />
     </Stack.Navigator>
   );

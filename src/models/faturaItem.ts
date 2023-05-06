@@ -94,4 +94,6 @@ export class FormaPagamento {
 	cor: string
 	dataCriacao: string
 	dataAlteracao: string
+	dinheiro?: boolean
+	cartao?: boolean
 }

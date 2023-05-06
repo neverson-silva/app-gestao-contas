@@ -61,7 +61,6 @@ export const DetalhesFaturaMesPessoaScreen: React.FC = () => {
           },
         }
       );
-      console.log("data", data);
       setBarchartData(data);
     } finally {
       setLoadingChart(false);
@@ -107,6 +106,7 @@ export const DetalhesFaturaMesPessoaScreen: React.FC = () => {
     navigation.navigate(ERoutes.ROUTE_DETALHE_LANCAMENTO, {
       idLancamento: faturaItem.lancamento.id,
       compraNome: faturaItem.nome,
+      faturaItem,
     });
   };
 

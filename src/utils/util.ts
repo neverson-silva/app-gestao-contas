@@ -75,3 +75,13 @@ export const isValidValue = (value: unknown): boolean => {
   }
   return false;
 };
+
+export const chunk = (array: any[], size: number) => {
+  const chunks = [];
+  let i = 0;
+  while (i < array.length) {
+    chunks.push(array.slice(i, i + size));
+    i += size;
+  }
+  return chunks;
+};

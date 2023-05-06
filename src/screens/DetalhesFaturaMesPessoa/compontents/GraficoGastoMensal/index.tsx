@@ -37,6 +37,7 @@ export const GraficoGastoMensal: React.FC<GraficoGastoMensalProps> = ({
         <VictoryChart width={400} height={400}>
           <VictoryArea
             data={data}
+            interpolation={"natural"}
             style={{
               data: {
                 fill: colors.tertiary[400],

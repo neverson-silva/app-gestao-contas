@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { StatusBar, useTheme, ScrollView, Box } from "native-base";
+import { StatusBar, useTheme, ScrollView, Box, Button } from "native-base";
 
 import { useAuth } from "@contexts/auth/useAuth";
 import { ResumoPessoasList } from "./components/ResumoPessoasList";
